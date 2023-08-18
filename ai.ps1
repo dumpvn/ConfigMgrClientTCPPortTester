@@ -136,5 +136,18 @@ $asyncwindow = Add-Type -MemberDefinition $windowcode -name Win32ShowWindowAsync
 $null = $asyncwindow::ShowWindowAsync((Get-Process -PID $pid).MainWindowHandle, 0) 
  
 $app = [Windows.Application]::new()
-$DataGrid.ItemsSource = Get-Service | Select Name,ServiceName,Status,StartType
+
+
+$e = (Get-KPEntry -Title 'jira-token' -AsPlainText)
+$jql = $(
+    'assignee=currentuser()'
+    "status not in ('Closed')"
+) -join ' and '
+$jql = UrlEncode $jql
+
+$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $e.username,$e.password)))
+$r = Invoke-RestMethod -Uri https://mypinpad.atlassian.net/rest/api/2/search?jql=$jql -Method Get -Headers @{ Authorization=("Basic {0}" -f $base64AuthInfo) }
+
+
+$DataGrid.ItemsSource = $r.issues | select key,@{n='Status';e={$_.fields.status.Name}},@{n='Priority';e={$_.fields.priority.name}},@{n='summary';e={$_.fields.summary}},@{n='LastComment';e={Get-JiraIssueLastComment $_.id}}
 $app.Run($Window) # term:wpf
