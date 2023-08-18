@@ -20,13 +20,18 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ComboBox Grid.Row="0" Name="SelectTest" Width="Auto" Controls:TextBoxHelper.Watermark="Select Test" ItemsSource="{Binding [17]}" Margin="1" Foreground="Purple"/>
+
+        <ComboBox Grid.Row="0" Name="SelectTest" Width="Auto" 
+            Controls:TextBoxHelper.Watermark="Select Test" 
+            ItemsSource="{Binding [17]}" Margin="1" Foreground="Purple"/>
+
         <StackPanel Grid.Row="1">
             <GroupBox Name="Client" Header="Client Ports (Inbound)" Margin="1">
                 <GroupItem>
                     <StackPanel>
                         <Button Name="ClientGo" HorizontalAlignment="Right" Content="GO" Width="100" />
-                        <DataGrid Name="ClientGrid" Margin="2" ItemsSource="{Binding [0].DefaultView}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" MinHeight="150">
+                        <DataGrid Name="ClientGrid" Margin="2" ItemsSource="{Binding [0].DefaultView}" AutoGenerateColumns="False" 
+                            CanUserAddRows="False" IsReadOnly="True" MinHeight="150">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Port" Binding="{Binding Path=Port}" Width="100" />
                                 <DataGridTemplateColumn Header="Status" Width="80">
@@ -155,6 +160,7 @@
                 </GroupItem>
             </GroupBox>
         </StackPanel>
+
         <StackPanel Grid.Row="2">
             <Controls:MetroProgressBar IsIndeterminate="{Binding [0]}" />
             <StatusBar Background="White">
@@ -163,5 +169,6 @@
                 </StatusBarItem>
             </StatusBar>
         </StackPanel>
+
     </Grid>
 </Window>

@@ -11,13 +11,15 @@
 
 # Set the location we are running from
 $Source = $PSScriptRoot
+<# 
+$Source = $pwd.Path; $Source
+#>
 
 # Load the function library
 . "$Source\bin\FunctionLibrary.ps1"
 
 # Do PS version check
-If ($PSVersionTable.PSVersion.Major -lt 5)
-{
+If ($PSVersionTable.PSVersion.Major -lt 5) {
     $Content = "ConfigMgr Client TCP Port Tester cannot start because it requires minimum PowerShell 5."
     New-WPFMessageBox -Content $Content -Title "Oops!" -TitleBackground Red -TitleTextForeground White -TitleFontSize 20 -TitleFontWeight Bold -BorderThickness 1 -BorderBrush Red -Sound 'Windows Exclamation'
     Break
@@ -25,20 +27,16 @@ If ($PSVersionTable.PSVersion.Major -lt 5)
 
 # Do .Net Version Check
 $Release = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" -Name Release).Release
-If ($Release -lt 394802)
-{
+If ($Release -lt 394802) {
     $Content = "ConfigMgr Client TCP Port Tester cannot start because it requires minimum .Net Framework 4.6.2."
     New-WPFMessageBox -Content $Content -Title "Oops!" -TitleBackground Red -TitleTextForeground White -TitleFontSize 20 -TitleFontWeight Bold -BorderThickness 1 -BorderBrush Red -Sound 'Windows Exclamation'
     Break
 }
 
 # Do Cmdlet Check
-Try
-{
+Try {
     $null = Get-Command Test-NetConnection -ErrorAction Stop
-}
-Catch
-{
+} Catch {
     $Content = "ConfigMgr Client TCP Port Tester cannot start because the required PowerShell cmdlets are not present."
     New-WPFMessageBox -Content $Content -Title "Oops!" -TitleBackground Red -TitleTextForeground White -TitleFontSize 20 -TitleFontWeight Bold -BorderThickness 1 -BorderBrush Red -Sound 'Windows Exclamation'
     Break 
@@ -56,8 +54,7 @@ Add-Type -Path "$Source\bin\MahApps.Metro.dll"
 # Create a synchronized hash table and add the WPF window and its named elements to it
 $UI = [System.Collections.Hashtable]::Synchronized(@{})
 $UI.Window = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $xaml))
-$xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | 
-    ForEach-Object -Process {
+$xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
         $UI.$($_.Name) = $UI.Window.FindName($_.Name)
     }
 
@@ -111,35 +108,28 @@ $UI.Window.DataContext = $UI.DataSource
 
 
 # Load the defaults
-Try
-{
+Try {
     [xml]$Defaults = Get-Content "$Source\defaults\Defaults.xml" -ErrorAction Stop
-}
-Catch
-{
+} Catch {
     $Content = "ConfigMgr Client TCP Port Tester cannot find the default values. Check that .\defaults\Defaults.xml exists."
     New-WPFMessageBox -Content $Content -Title "Oops!" -TitleBackground Red -TitleTextForeground White -TitleFontSize 20 -TitleFontWeight Bold -BorderThickness 1 -BorderBrush Red -Sound 'Windows Exclamation'
     Break
 }
 
 $UI.DefaultLocalPorts = @()
-foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.LocalPorts)
-{
+foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.LocalPorts) {
     $UI.DefaultLocalPorts += $port
 }
 $UI.DefaultManagementPointPorts = @()
-foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.ManagementPointPorts)
-{
+foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.ManagementPointPorts) {
     $UI.DefaultManagementPointPorts += $port
 }
 $UI.DefaultDistributionPointPorts = @()
-foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.DistributionPointPorts)
-{
+foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.DistributionPointPorts) {
     $UI.DefaultDistributionPointPorts += $port
 }
 $UI.DefaultSoftwareUpdatePointPorts = @()
-foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.SoftwareUpdatePointPorts)
-{
+foreach ($Port in $Defaults.ConfigMgr_Port_Tester.PortDefaults.SoftwareUpdatePointPorts) {
     $UI.DefaultSoftwareUpdatePointPorts += $port
 }
 
@@ -151,8 +141,7 @@ $ClientGridDataTable = New-Object System.Data.DataTable
     [System.Data.DataColumn]::new("Icon")
     [System.Data.DataColumn]::new("Purpose")
 ))
-Foreach ($Port in $UI.DefaultLocalPorts.Port)
-{
+Foreach ($Port in $UI.DefaultLocalPorts.Port) {
     [void]$ClientGridDataTable.Rows.Add($Port.Name,"$Source\bin\Unknown.bmp",$Port.Purpose)
 }
 $UI.ClientGridDataSource.Add($ClientGridDataTable)
@@ -166,8 +155,7 @@ $MPGridDataTable = New-Object System.Data.DataTable
     [System.Data.DataColumn]::new("Icon")
     [System.Data.DataColumn]::new("Purpose")
 ))
-Foreach ($Port in $UI.DefaultManagementPointPorts.Port)
-{
+Foreach ($Port in $UI.DefaultManagementPointPorts.Port) {
     [void]$MPGridDataTable.Rows.Add($Port.Name,"$Source\bin\Unknown.bmp",$Port.Purpose)
 }
 $UI.MPGridDataSource.Add($MPGridDataTable)
@@ -181,8 +169,7 @@ $DPGridDataTable = New-Object System.Data.DataTable
     [System.Data.DataColumn]::new("Icon")
     [System.Data.DataColumn]::new("Purpose")
 ))
-Foreach ($Port in $UI.DefaultDistributionPointPorts.Port)
-{
+Foreach ($Port in $UI.DefaultDistributionPointPorts.Port) {
     [void]$DPGridDataTable.Rows.Add($Port.Name,"$Source\bin\Unknown.bmp",$Port.Purpose)
 }
 $UI.DPGridDataSource.Add($DPGridDataTable)
@@ -196,8 +183,7 @@ $SUPGridDataTable = New-Object System.Data.DataTable
     [System.Data.DataColumn]::new("Icon")
     [System.Data.DataColumn]::new("Purpose")
 ))
-Foreach ($Port in $UI.DefaultSoftwareUpdatePointPorts.Port)
-{
+Foreach ($Port in $UI.DefaultSoftwareUpdatePointPorts.Port) {
     [void]$SUPGridDataTable.Rows.Add($Port.Name,"$Source\bin\Unknown.bmp",$Port.Purpose)
 }
 $UI.SUPGridDataSource.Add($SUPGridDataTable)
@@ -224,13 +210,10 @@ $UI.SUPName.Text = $Defaults.ConfigMgr_Port_Tester.ServerDefaults.SoftwareUpdate
 
 # Display the main window
 # If code is running in ISE, use ShowDialog()...
-if ($psISE)
-{
+if ($psISE) {
     $null = $UI.window.Dispatcher.InvokeAsync{$UI.window.ShowDialog()}.Wait()
-}
-# ...otherwise run as an application
-Else
-{
+} Else {
+    # ...otherwise run as an application
     # Hide the PowerShell console window
     $windowcode = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
     $asyncwindow = Add-Type -MemberDefinition $windowcode -Name Win32ShowWindowAsync -Namespace Win32Functions -PassThru
