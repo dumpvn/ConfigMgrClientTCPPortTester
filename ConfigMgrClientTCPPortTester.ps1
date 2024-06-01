@@ -1,5 +1,5 @@
 ﻿<# 
-. ${{file}}
+. "${{file}}"
 Push-Location (Split-Path ${{file}}); push x; Pop-Location
 #>
 

@@ -1,4 +1,6 @@
-Add-Type -AssemblyName PresentationFramework # term:jira
+
+
+Add-Type -AssemblyName PresentationFramework
 
 $Window = New-Object Windows.Window
 $Window.Height = "670"
@@ -65,4 +67,4 @@ $null = $asyncwindow::ShowWindowAsync((Get-Process -PID $pid).MainWindowHandle, 
  
 $app = [Windows.Application]::new()
 
-$app.Run($Window) # term:jira
+$app.Run($Window)

@@ -1,4 +1,7 @@
-Add-Type -AssemblyName PresentationFramework # term:wpf
+<# 
+. ${{file}}
+#>
+Add-Type -AssemblyName PresentationFramework 
 
 $Window = New-Object Windows.Window
 $Window.Height = "670"
@@ -149,5 +152,5 @@ $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0
 $r = Invoke-RestMethod -Uri https://mypinpad.atlassian.net/rest/api/2/search?jql=$jql -Method Get -Headers @{ Authorization=("Basic {0}" -f $base64AuthInfo) }
 
 
-$DataGrid.ItemsSource = $r.issues | select key,@{n='Status';e={$_.fields.status.Name}},@{n='Priority';e={$_.fields.priority.name}},@{n='summary';e={$_.fields.summary}},@{n='LastComment';e={Get-JiraIssueLastComment $_.id}}
+$DataGrid.ItemsSource = $r.issues | select key,@{n='+';e={$_.fields.status.Name}},@{n='Priority';e={$_.fields.priority.name}},@{n='summary';e={$_.fields.summary}},@{n='LastComment';e={Get-JiraIssueLastComment $_.id}}
 $app.Run($Window) # term:wpf
